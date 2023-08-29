@@ -1,24 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Login from './components/Login';
+import Logout from './components/Logout';
+import UserPanel from './components/UserPanel';
+import LoadingComponent from './components/Loading';
 
 function App() {
+  const [loggedIn, setLoggedIn] = useState(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      const token = localStorage.getItem('jwt');
+      if (token) {
+        setLoggedIn(true);
+      } else {
+        setLoggedIn(false);
+      }
+    }, 1000);
+  }, []);
+
+  if (loggedIn === null) {
+    return <LoadingComponent />;
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className='App'>
+        {loggedIn ? (
+          <>
+            <Logout setLoggedIn={setLoggedIn} />
+            <Routes>
+              <Route path='/' element={<UserPanel />} />
+            </Routes>
+          </>
+        ) : (
+          <Login setLoggedIn={setLoggedIn} />
+        )}
+      </div>
+    </Router>
   );
 }
 
